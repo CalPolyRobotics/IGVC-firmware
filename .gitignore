@@ -8,6 +8,15 @@
 *.lst
 *.swp
 
+# FreeRTOS files
+*.eep
+*.lss
+*.map
+*.sym
+*.atsln
+*.atsuo
+*.cproj
+
 # Libraries
 *.lib
 *.a
