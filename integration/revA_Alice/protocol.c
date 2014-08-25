@@ -1,8 +1,11 @@
 /**
- * Skeleton of command recieve and response
+ * protocol.c
+ * Written by Louie Thiros and Gerik Kubiak
  *
- * @author Louie Thiros
- */
+ * Provides helper functions to send and recieve data
+ * to and from the ATmega. Used to implement the
+ * communication protocol.
+**/
 
 #include <avr/io.h>
 #include "FreeRTOS.h"
@@ -28,14 +31,13 @@ char processBrakeCommand(char commandCode, void* commandData, Response* response
 char processBatteryCommand(char commandCode, void* commandData, Response* responseData); 
 char processLightCommand(char commandCode, void* commandData, Response* responseData); 
 
-
-//function to CRC the command structure
-char commandIntegCheck(Command *command) {
-   //CRC the command with 0x00 in place of the CRC
-   //return success for now
-   return 1;
-}
-
+/*
+ * Gets data from the Ultrasonic sensors.
+ *
+ * char commandCode: The specific command to call.
+ * void* commandData: Data from the master to pass to the device.
+ * Response* responseData: The response from the device.
+ */
 char processUltrasonicCommand(char commandCode, void* commandData, Response* responseData) {
    switch(commandCode) {
       case GET_ALL_SENSORS:
@@ -51,10 +53,12 @@ char processUltrasonicCommand(char commandCode, void* commandData, Response* res
          getSensorGroup(((unsigned char*)commandData)[0], (unsigned char*) responseData->payload);
          break;
    }
-   //return success for now...
    return 1;
 }
 
+/*
+ * Similar to the Ultrasonic.
+ */
 char processSpeedCommand(char commandCode, void* commandData, Response* responseData) {
    switch(commandCode) {
       case GET_SPEED:
@@ -66,10 +70,12 @@ char processSpeedCommand(char commandCode, void* commandData, Response* response
          setSpeed(((char*)commandData)[0]);
          break;
    }
-   //return success for now
    return 1;
 }
 
+/*
+ * Similar to the Ultrasonic.
+ */
 char processSteeringCommand(char commandCode, void* commandData, Response* responseData) {
 
    switch(commandCode) {
@@ -95,10 +101,12 @@ char processSteeringCommand(char commandCode, void* commandData, Response* respo
          PORTJ ^= (1 << PB4);
          break;
    }
-   //return success for now
    return 1;
 }
 
+/*
+ * Similar to the Ultrasonic.
+ */
 char processFNRCommand(char commandCode, void* commandData, Response* responseData) {
    switch(commandCode) {
       case SET_FNR:
@@ -113,6 +121,9 @@ char processFNRCommand(char commandCode, void* commandData, Response* responseDa
    return 1;
 }
 
+/*
+ * Similar to the Ultrasonic.
+ */
 char processBrakeCommand(char commandCode, void* commandData, Response* responseData) {
    switch(commandCode) {
       case SET_BRAKE:
@@ -125,6 +136,9 @@ char processBrakeCommand(char commandCode, void* commandData, Response* response
    return 1;
 }
 
+/*
+ * Similar to the Ultrasonic.
+ */
 char processBatteryCommand(char commandCode, void* commandData, Response* responseData) {
    switch(commandCode) {
       case GET_BATTERY_VOLTAGE:
@@ -137,6 +151,9 @@ char processBatteryCommand(char commandCode, void* commandData, Response* respon
    return 1;
 }
 
+/*
+ * Similar to the Ultrasonic.
+ */
 char processLightCommand(char commandCode, void* commandData, Response* responseData) {
 	responseData->size = 0;
    switch(commandCode) {
@@ -147,11 +164,13 @@ char processLightCommand(char commandCode, void* commandData, Response* response
    return 1;
 }
 
-
-
-//Function that will take in a command (as char array) and process it into a
-//correct response to be stored into response
-char processCommand(Command *command, Response *response) {
+/*
+ * Takes in a command, calls the appropriate function, and returns the result.
+ *
+ * Command* command: The incoming command.
+ * Response* response: The response to send back.
+ */
+char processCommand(Command* command, Response* response) {
 	response->commandBack = command->cmd;
 
    switch(command->groupID) {
@@ -181,6 +200,5 @@ char processCommand(Command *command, Response *response) {
          /*do error things*/
          break;
    }
-   //return a dummy success for now
    return 1;
 }

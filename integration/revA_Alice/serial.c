@@ -1,3 +1,9 @@
+/**
+ * protocol.c
+ * Written by Gerik Kubiak.
+ *
+ * implements the serial command protocol.
+**/
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -17,13 +23,18 @@ uint8_t calcChecksum(uint8_t* buffer, uint8_t size);
 void sendACK(void);
 void sendNACK(void);
  
-
 typedef enum {RecvHeader, RecvPayload, SendHeaderACK, SendPayloadACK} ReadState;
 
 extern int globalTickCount;
 
-//Run one instance of the serial Communication FSM. This is called
-//from the USART RX interrupt. Therefore there should be minimal code here
+/*
+ * Run one instance of the serial Communication FSM. This is called
+ * from the USART RX interrupt. The interrupt length does not cause
+ * any problems currently. If errors begin to occur, run the protocol
+ * at a slower rate or slim down this function.
+ * 
+ * unsigned char data: Incoming data to the FSM.
+*/
 void runSerialFSM(unsigned char data) {
 
     static ReadState FSMState = RecvHeader;
@@ -114,6 +125,11 @@ void runSerialFSM(unsigned char data) {
 
 }
 
+/*
+ * Send the header packet to start the response.
+ *
+ * Response* response: The response struct to base the header off of.
+ */
 void sendHeader(Response* response){
     uint8_t checksumBuffer[2];
 
@@ -124,11 +140,25 @@ void sendHeader(Response* response){
     USARTQueueVar((uint8_t)calcChecksum(checksumBuffer,2));
 }
 
+/*
+ * Send the payload response.
+ *
+ * Response* response: The response containing the payload and size.
+ */
 void sendPayload(Response* response){
     USARTQueueBuf((char*)response->payload, response->size);
     USARTQueueVar(calcChecksum((uint8_t*)response->payload,response->size));
 }
 
+/*
+ * Calculates the approprite checksum for a buffer. The checksum
+ * is calculated by adding all the bytes and tossing the overflow.
+ * 
+ * uint8_t* buffer: The buffer to calculate the checksum for.
+ * uint8_t size: The size of the buffer in bytes.
+ * 
+ * return: The correct checksum.
+ */
 uint8_t calcChecksum(uint8_t* buffer, uint8_t size){
    uint8_t checksum = 0;
    int i;   
@@ -138,10 +168,16 @@ uint8_t calcChecksum(uint8_t* buffer, uint8_t size){
    return checksum;
 }
 
+/*
+ * Helper function to send an Acknowledgement byte.
+ */
 void sendACK() {
    USARTQueueVar(ACK_BYTE);
 }
 
+/*
+ * Helper function to send a non-Acknowledgement byte.
+ */
 void sendNACK() {
    USARTQueueVar(NACK_BYTE);
 }

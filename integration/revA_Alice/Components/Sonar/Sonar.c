@@ -1,4 +1,9 @@
-// Code to controller the Sonar sensors
+/**
+ * Sonar.c
+ * Written by Gerik Kubiak
+ *
+ * The Sonar or Ultrasonic device driver.
+**/
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include <avr/interrupt.h>
@@ -16,40 +21,56 @@ static int sonarNum1 = 1;
 static int sonarNum2 = 2;
 static int sonarNum3 = 3;
 
-void setSonarData(int i,int data){
-   sonarData[i] = data;
+/*
+ * Gets value from the last sonar read.
+ *
+ * int sonar: The sonar number to read.
+ */
+int getSonarData(int sonar){
+   return sonarData[sonar];
 }
 
-int getSonarData(int i){
-   return sonarData[i];
-   //return i + 10;
+/*
+ * The callback for all sonar sensors. Uses the void* parameter
+ * to pass information about which sonar has been read.
+ *
+ * int result: The value from the ADC read.
+ * void* sonarNum: A pointer to the sonar number which has been read.
+ */
+void sonarADCHandler(int result, void* sonarNum){
+	sonarData[*((int *)sonarNum)] = result;
 }
 
-void sonarADCHandler(int result,void *sonarNum){
-
-	setSonarData(*((int *)sonarNum),result);
-
-}
-
+/*
+ * Initialize the sonar sensor ADC callbacks with the ADC.
+ */
 void initializeSonarSensors(){
-
 	addADCDevice(1,ADC_OPT_PRECISION_HIGH,sonarADCHandler,&sonarNum0);			
    addADCDevice(2,ADC_OPT_PRECISION_HIGH,sonarADCHandler,&sonarNum1);
 	addADCDevice(3,ADC_OPT_PRECISION_HIGH,sonarADCHandler,&sonarNum2);			
 	addADCDevice(4,ADC_OPT_PRECISION_HIGH,sonarADCHandler,&sonarNum3);			
-
 }
 
+/*
+ * Returns the value of all the sonar sensors.
+ *
+ * unsigned char* responseData: A pointer where to store the sonar results.
+ */
 char getAllSensors(unsigned char* responseData){
    unsigned short i;
    for(i=0;i<6;i++){
       responseData[i*2] = (unsigned char)(getSonarData(i) & 0xFF);
       responseData[i*2 + 1] = (unsigned char)(getSonarData(i) >> 8);
-      //responseData[i] = i+1;
    }
    return 1;
 }
 
+/*
+ * Returns the value of a specific sonar sensore.
+ *
+ * unsigned char commandData: The sonar sensor to read.
+ * unsigned char* responseData: A pointer where to store the sonar results.
+ */
 char getCertainSensor(unsigned char commandData,unsigned char* responseData){
 
    if(commandData < 6){
@@ -59,6 +80,12 @@ char getCertainSensor(unsigned char commandData,unsigned char* responseData){
    return 1;
 }
 
+/*
+ * Returns the value of a group of sonar sensore. Left, Right, Front.
+ *
+ * unsigned char commandData: The sonar sensor group to read.
+ * unsigned char* responseData: A pointer where to store the sonar results.
+ */
 char getSensorGroup(unsigned char commandData,unsigned char* responseData){
 
    switch(commandData){
@@ -85,5 +112,4 @@ char getSensorGroup(unsigned char commandData,unsigned char* responseData){
 
    }
    return 1;
-
 }

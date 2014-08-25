@@ -1,3 +1,12 @@
+/**
+ * ADC.c
+ * Written by Gerik Kubiak.
+ *
+ * Controls the ADC on the ATmega. Devices can
+ * register an ADC port and will get a callback
+ * when the ADC has processed the data.
+**/
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -22,7 +31,9 @@ static ADCDevice devices[16];
 static int currDevice = 0;
 static int ADCinitialized = 0;
 
-//Initialize ADC registers
+/*
+ * Initializes ADC register. Should only be called once before running the ADC.
+ */
 void initADC(){
    //Uncomment when ADC is fixed
 	/*ADCSRA = _BV(ADEN);
@@ -32,9 +43,11 @@ void initADC(){
 	
 }
 
-//If the ADC isn't running, start it
+/*
+ * Starts the ADC on the given device. The ADC will be stopped when the conversion
+ * is done by the interrupt handler.
+ */
 void ADCStart(ADCDevice* nextDevice) {
-
 		
 	if(!(ADCSRA & _BV(ADSC))){
 		ADCSRA &= ~((1 << ADPS2)|(1 << ADPS1)|(1 << ADPS0));
@@ -65,7 +78,11 @@ void ADCStart(ADCDevice* nextDevice) {
 	}
 }
 
-//Read the finished value of the ADC and store it
+/*
+ * Called after an ADC conversion is finished. Reads the result in and calls
+ * the appropriate callback. Gives a semaphore to signal that the ADC conversion
+ * has completed.
+ */
 ISR(ADC_vect) {
 	int result = ADCL;
 	result |= (ADCH << 8);
@@ -82,6 +99,10 @@ ISR(ADC_vect) {
 	xSemaphoreGiveFromISR(adcSemaphore,0);
 }
 
+/*
+ * Task which runs the ADC. Initializes the ADC and waits for a conversion to finish.
+ * Cycles through every registed device and runs a conversion.
+ */
 void vTaskADC(void *parameters){
 	
 	int i;
@@ -125,15 +146,22 @@ void vTaskADC(void *parameters){
       if(currDevice > 6 || devices[currDevice].port == -1) currDevice = 0;
       vTaskDelay(1);
    }
-      
-   
 }
 
+/*
+ * Register a device so that it can use the ADC.
+ * 
+ * int port: The ADC port, 0-15, that the device uses.
+ * int options: The length of time the device will use the ADC. This has
+ *              an effect on the accuracy of the ADC. See ADC.h
+ * ADCHandler handler: The function to call when the ADC has finished the
+ *                     conversion.
+ * void* parameters: This argument gets passed directly to the handler. Used
+                       to send information directly to the handler.
+ */
 void addADCDevice(int port,int options,ADCHandler handler,void* parameters){
 	int i;
 	
-	//Creating a device before all the structures are initialized
-	//could lead to race conditions.
 	while(ADCinitialized == 0) vTaskDelay(3);
 
 	for(i = 0; i < 16 && devices[i].port != -1; i++)

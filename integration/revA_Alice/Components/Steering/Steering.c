@@ -1,10 +1,17 @@
+/*
+ * Steering.c
+ * Written by Gerik Kubiak.
+ *
+ * Contains code to steer the golf cart to a specific
+ * angle represented by an linear encoder value.
+ */
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "../../ADC.h"
 #include "Steering.h"
-//Steering group
 
 #define STEERING_PORT	PORTB
 #define STEERING_LEFT	(1 << 5)
@@ -27,7 +34,6 @@ static int steeringTarget;
 static int steeringValue;
 
 static int steeringDir;
-static int steeringSpd;
 
 static int zeroCurrentDelay;
 
@@ -37,15 +43,20 @@ void USARTQueueVar(char a);
 void printWheelAngle(void);
 void getLinearPotCallback(int data, void *parameters);
 
-
+/*
+ * The ADC callback for the linear encoder.
+ *
+ * int data: The data from the ADC.
+ */
 void getLinearPotCallback(int data,void *parameters){
-	//wheelAngle = data / -4 + 72;
    steeringValue = data;
 }
 
+/*
+ * Initialize the timing registers used to pwm the motor controllers.
+ */
 void initializeSteeringTimer(){
 	
-	//TCCR1A = (1 << COM1A1)|(1 << WGM11);
    TCCR1A = (1 << WGM11)|(1 << WGM10)|(1 << COM1B1)|(1 << COM1B0)|
       (1 << COM1C1)|(1 << COM1C0);
 	TCCR1B = (1 << WGM12)|(1 << CS10);
@@ -58,9 +69,13 @@ void initializeSteeringTimer(){
    OCR1CL = 0;
 }
 
+/*
+ * Sets the appropriate PWM duty cycle and direction
+ * based on the steering Direction and speed.
+ *
+ * int spd: A value representing how fast to move the motor.
+ */
 void setSteeringPWMSpeed(int spd){
-   steeringSpd = spd * steeringDir;
-
    if(spd > 0x3FF) spd = 0x3FF;
 
    if(steeringDir == -1) {
@@ -81,13 +96,21 @@ void setSteeringPWMSpeed(int spd){
    }
 }
 
-
-
+/*
+ * Sets the direction to steer the motor.
+ * 
+ * int dir: Either 1 or -1. Which direction this results in 
+ * depends on how the motor is connected.
+ */
 void setSteeringDirection(int dir){
    steeringDir = dir;
 }
 
-//JUST SETS ANGLE TARGET. Actual angle changing is lower level
+/*
+ * Sets the target angle as a target linear encoder value.
+ *
+ * unsigned char* angleTarget: The target linear encoder value.
+ */
 char setAngle(unsigned char* angleTarget) {
 	steeringTarget = angleTarget[0];
    steeringTarget |= (angleTarget[1] << 8);
@@ -95,37 +118,47 @@ char setAngle(unsigned char* angleTarget) {
    return 1;
 }
 
-//get the current angle of the steering system
+/*
+ * Gets the current linear encoder value.
+ *
+ * unsigned char* sensorResponse: A pointer where to put the current
+ *                                linear encoder value.
+ */
 char getAngle(unsigned char* sensorResponse) {
    sensorResponse[0] = (unsigned char)(steeringValue & 0xFF);
    sensorResponse[1] = (unsigned char)(steeringValue >> 8);
-   //return success
    return 1;
 }
 
-//get the angle target. argument name is sensorResponse for the sake of consistancy
+/*
+ * Get the current target linear encoder angle.
+ *
+ * unsigned char* sensorResponse: A pointer where to put the current
+ *                                target linear encoder value.
+ */
 char getDesiredAngle(unsigned char* sensorResponse) {
    sensorResponse[0] = (unsigned char)(steeringTarget & 0xFF);
    sensorResponse[1] = (unsigned char)(steeringTarget >> 8);
-   //return success
    return 1;
 }
 
-//change the PID controller
+/*
+ * Change PID sensitivity. Not currently implemented. May never be.
+ */
 char changePID(char P, char I, char D) {
-   //dummy function, nothing happens
-   //return success
    return 1;
 }
 
-//not sure what this does. Also not sure why upper and lower are separated
-//but its in the specs so...
+/*
+ * Sets the upper and lower bounds to steer the golf cart. Not currently implemented.
+ */
 char setLimits(char upper, char lower) {
-   //dummy function, nothing happens
-   //return success
    return 1;
 }
 
+/*
+ * Prints the current wheel angle over serial. Disrupts the serial communication protocol.
+ */
 void printWheelAngle() {
    if(steeringValue & 0x1000) {
       USARTQueueVar('-');
@@ -136,8 +169,10 @@ void printWheelAngle() {
    USARTQueueVar('\n');
 }
 
+/*
+ * Task used to steer the golf cart. Implements a basic P controller.
+ */
 void vTaskSteer(void* parameters){
-
 
 	addADCDevice(0,ADC_OPT_PRECISION_HIGH,getLinearPotCallback,NULL);
 
@@ -157,7 +192,6 @@ void vTaskSteer(void* parameters){
 	      setSteeringDirection(1);
 	   } else {
 	      setSteeringDirection(0);
-	      //steeringTarget = wheelAngle;
 	   }
 
       if(zeroCurrentDelay > 0){
@@ -167,9 +201,6 @@ void vTaskSteer(void* parameters){
 
          setSteeringPWMSpeed(adjust + 140);
       }
-      //printNum(adjust + 50);
-      //USARTQueueVar(' ');
-      //printWheelAngle();
  
 	   vTaskDelay(10);
 	}
