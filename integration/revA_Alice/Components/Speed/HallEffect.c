@@ -12,7 +12,10 @@
 #include "HallEffect.h"
 #include "../../usart.h"
 
-static int hallData = 0;
+static unsigned int hallData = 0;
+
+//If the timer overflows the next value is not useful. Throw it out.
+static char trashData = 0;
 
 /*
  * Initialize the timers and pin change interrups
@@ -27,6 +30,7 @@ void initializeHallEffect() {
    TCNT4H = 0;
    TCNT4L = 0;
 
+   //PCMSK1 = 0xFF;
    PCMSK1 = (1 << PCINT14);
    PCICR = 1 << PCIE1;
 
@@ -37,8 +41,21 @@ void initializeHallEffect() {
  * Reads and resets the timer on every Hall Effect edge.
  */
 ISR(PCINT1_vect) {
-   hallData = TCNT4L;
-   hallData |= (TCNT4H << 8);
+   if(trashData == 0) {
+      
+      hallData = TCNT4L;
+      hallData |= (TCNT4H << 8);
+     
+      //Jitter from the sensor can cause false edges. Mark as bad
+      if(hallData < 100) {
+         hallData = 1;
+         trashData = 1;
+      }
+
+   } else {
+      trashData = 0;
+   }
+
    TCNT4H = 0;
    TCNT4L = 0;
 }
@@ -48,6 +65,7 @@ ISR(PCINT1_vect) {
  */
 ISR(TIMER4_OVF_vect) {
    hallData = 0;
+   trashData = 1;
 }
 
 /*

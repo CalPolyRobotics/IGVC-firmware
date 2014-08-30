@@ -58,7 +58,7 @@ int main( void )
    DDRF = 0;
    DDRG = 0;
    DDRH = 0xFE;
-	DDRJ = 0x02 | (1 << PJ5);
+   DDRJ = 0x2;
    DDRK = 0;
    DDRL = 0xF0;
 
@@ -97,7 +97,7 @@ void vTaskMain()
    initializeSonarSensors();
    initializeUSART();
    initializeSPI();
-   //initializeHallEffect();
+   initializeHallEffect();
 
    for(;;) {
       vTaskDelay(5000);

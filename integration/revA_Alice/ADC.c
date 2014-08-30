@@ -15,6 +15,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+#include "usart.h"
 
 typedef struct ADCDevice {
 	int port;

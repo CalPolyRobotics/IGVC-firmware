@@ -11,6 +11,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "../../ADC.h"
+#include "../../usart.h"
 #include "Steering.h"
 
 #define STEERING_PORT	PORTB
@@ -37,9 +38,6 @@ static int steeringDir;
 
 static int zeroCurrentDelay;
 
-void printHex(int a);
-void printNum(int a);
-void USARTQueueVar(char a);
 void printWheelAngle(void);
 void getLinearPotCallback(int data, void *parameters);
 
