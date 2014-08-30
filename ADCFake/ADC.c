@@ -51,11 +51,9 @@ ISR(ADC_vect, ISR_NOBLOCK) {
 
    ADCSRA &= ~(_BV(ADEN));
    currDevice++;
-   //printHex16(result);
-   //USART_Write(' ');
+   
    if(currDevice > 5){
       currDevice = 0;
-      //printEndl();
    }
    
    ADMUX &= ~(0xF);
