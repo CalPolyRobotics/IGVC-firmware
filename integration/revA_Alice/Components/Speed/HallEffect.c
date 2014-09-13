@@ -24,8 +24,10 @@ static char trashData = 0;
 void initializeHallEffect() {
    
    TCCR4A = 0;
-   TCCR4B = (1 << CS42);
-   TIMSK4 = (1 << TOIE4);
+   TCCR4B = (1 << CS42)|(1 << CS40);
+   OCR4A = 0xFFFF;
+   TIMSK4 = (1 << OCIE4A)|(1 << TOIE4);
+   //TIMSK4 = (1 << TOIE4);
 
    TCNT4H = 0;
    TCNT4L = 0;
@@ -41,15 +43,23 @@ void initializeHallEffect() {
  * Reads and resets the timer on every Hall Effect edge.
  */
 ISR(PCINT1_vect) {
+   unsigned int data;
+
+
    if(trashData == 0) {
       
-      hallData = TCNT4L;
-      hallData |= (TCNT4H << 8);
+      data = TCNT4L;
+      data |= (TCNT4H << 8);
+
      
       //Jitter from the sensor can cause false edges. Mark as bad
-      if(hallData < 100) {
-         hallData = 1;
-         trashData = 1;
+      if(data > 100) {
+         hallData = data;
+         if(data < 0x3FFF) {
+            OCR4A = data << 1;
+         } else {
+            OCR4A = 0xFFFF;
+         } 
       }
 
    } else {
@@ -66,6 +76,18 @@ ISR(PCINT1_vect) {
 ISR(TIMER4_OVF_vect) {
    hallData = 0;
    trashData = 1;
+   OCR4A = 0xFFFF;
+}
+
+/*
+ * Used for dynamic overflow
+ */
+ISR(TIMER4_COMPA_vect) {
+   hallData = 0;
+   trashData = 1;
+   OCR4A = 0xFFFF;
+   TCNT4H = 0;
+   TCNT4L = 0;
 }
 
 /*

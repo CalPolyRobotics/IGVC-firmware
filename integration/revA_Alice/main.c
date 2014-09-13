@@ -99,8 +99,11 @@ void vTaskMain()
    initializeSPI();
    initializeHallEffect();
 
+   unsigned char dummy[2];
+
    for(;;) {
-      vTaskDelay(5000);
+      vTaskDelay(5);
+      getSpeed(dummy);
    }
 }
 
