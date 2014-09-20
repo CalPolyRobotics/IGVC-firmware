@@ -435,7 +435,9 @@ clean_list :
 # Remove the '-' if you want to see the dependency files generated.
 -include $(SRC:.c=.d)
 
-
+upload: $(TARGET).hex
+	cp $(TARGET).hex ../../../wirelessCode/$(TARGET).hex
+  
 
 # Listing of phony targets.
 .PHONY : all begin finish end sizebefore sizeafter gccversion coff extcoff \

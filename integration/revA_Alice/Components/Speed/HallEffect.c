@@ -17,6 +17,8 @@ static unsigned int hallData = 0;
 //If the timer overflows the next value is not useful. Throw it out.
 static char trashData = 0;
 
+static int hallEffectTicks = 0;
+
 /*
  * Initialize the timers and pin change interrups
  * used by the Hall Effect sensor.
@@ -47,6 +49,8 @@ ISR(PCINT1_vect) {
 
 
    if(trashData == 0) {
+
+      hallEffectTicks++;
       
       data = TCNT4L;
       data |= (TCNT4H << 8);
@@ -98,6 +102,18 @@ ISR(TIMER4_COMPA_vect) {
 void getSpeed(unsigned char* data) {
    data[0] = (unsigned char)(hallData & 0xFF);
    data[1] = (unsigned char)(hallData >> 8);
+}
+
+/*
+ * Returns the number of hall effect ticks since the last read.
+ *
+ * unsigned char* data: A pointer where to put the hall effect ticks.
+ */
+void getTicks(unsigned char* data) {
+   data[0] = (unsigned char)(hallEffectTicks & 0xFF);
+   data[1] = (unsigned char)(hallEffectTicks >> 8);
+   
+   hallEffectTicks = 0;
 }
 
 

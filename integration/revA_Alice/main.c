@@ -58,7 +58,7 @@ int main( void )
    DDRF = 0;
    DDRG = 0;
    DDRH = 0xFE;
-   DDRJ = 0x2;
+   DDRJ = (1 << 1)|(1 << 4);
    DDRK = 0;
    DDRL = 0xF0;
 

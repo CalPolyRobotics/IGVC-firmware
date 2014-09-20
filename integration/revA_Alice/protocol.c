@@ -69,6 +69,10 @@ char processSpeedCommand(char commandCode, void* commandData, Response* response
 			responseData->size = 0;
          setSpeed(((char*)commandData)[0]);
          break;
+      case GET_TICKS:
+         responseData->size = 2;
+         getTicks((unsigned char*) responseData->payload);
+         break;
    }
    return 1;
 }
@@ -98,7 +102,7 @@ char processSteeringCommand(char commandCode, void* commandData, Response* respo
          setLimits(((char*)commandData)[0], ((char*)commandData)[1]);
          break;
       case RESET_MOTOR_DRIVER:
-         PORTJ ^= (1 << PB4);
+         PORTJ ^= (1 << PJ4);
          break;
    }
    return 1;

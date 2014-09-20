@@ -26,6 +26,7 @@
 //speed commands
 #define GET_SPEED 0x00
 #define SET_SPEED 0x01
+#define GET_TICKS 0x02
 
 //steering commands
 #define SET_ANGLE 0x01

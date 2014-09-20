@@ -3,5 +3,6 @@
 
 void initializeHallEffect(void);
 void getSpeed(unsigned char* data);
+void getTicks(unsigned char* data);
 
 #endif
