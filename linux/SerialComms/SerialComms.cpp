@@ -30,7 +30,7 @@ COMM_STATUS SerialComms::sendHeader(){
 	int checksum = packet->groupID;
 	checksum += packet->cmd + packet->payloadSize;
 
-   RS232_SendByte(portNumber, packet->groupID);
+   RS232_SendByte(this->portNumber, packet->groupID);
    usleep(USART_DELAY);
    
 	RS232_SendByte(portNumber, packet->cmd);
@@ -47,7 +47,6 @@ COMM_STATUS SerialComms::sendHeader(){
 COMM_STATUS SerialComms::initializeComms(char* portStr, int baud){
    int portNum;
 
-	this->portNumber = portNumber;
 	this->baud = baud;
 
    cout << "getting port" << endl;
@@ -55,7 +54,8 @@ COMM_STATUS SerialComms::initializeComms(char* portStr, int baud){
    portNum = RS232_GetComportNumber(portStr);
 
    cout << "port num " << portNum << endl;
-   
+
+   this->portNumber = portNum;
 	
 	if(RS232_OpenComport(portNum,baud) != 0){
 		return COMM_FAILURE;

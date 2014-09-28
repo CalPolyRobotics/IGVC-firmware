@@ -56,7 +56,8 @@ int main(int argc, char** argv){
    do {
 		//controller.getSpeed((char)FNRState);
       int i;
-      controller.getHallEffectTicks();
+      //controller.getHallEffectTicks();
+      controller.getSpeed();
       //controller.getSonarAll();
       retPayload = controller.getResults();
       if(retPayload.payload){
@@ -71,8 +72,9 @@ int main(int argc, char** argv){
       }
       //FNRState++;
       //if(FNRState == 2) FNRState = -1;
-      usleep(atoi(argv[1]));
-   } while(runForever);
+      //usleep(atoi(argv[1]));
+      usleep(500);
+   } while(1);
 
    //return 0;
       
