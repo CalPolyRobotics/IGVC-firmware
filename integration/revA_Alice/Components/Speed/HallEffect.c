@@ -37,7 +37,6 @@ void initializeHallEffect() {
    //PCMSK1 = 0xFF;
    PCMSK1 = (1 << PCINT14);
    PCICR = 1 << PCIE1;
-
 }
 
 /*
