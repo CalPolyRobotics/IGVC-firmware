@@ -58,7 +58,8 @@ int main( void )
    DDRF = 0;
    DDRG = 0;
    DDRH = 0xFE;
-   DDRJ = (1 << 1)|(1 << 4);
+   //DDRJ = (1 << 1)|(1 << 4);
+   DDRJ = 0xFF;
    DDRK = 0;
    DDRL = 0xF0;
 
@@ -88,7 +89,7 @@ int main( void )
  * Initializes various devices and enters a infinite loop.
  */
 void vTaskMain()
-{	
+{ 
 	/*initializeSteeringTimer();
 
 	initializeSPI();
@@ -99,11 +100,9 @@ void vTaskMain()
    initializeSPI();
    initializeHallEffect();
 
-   unsigned char dummy[2];
-
    for(;;) {
-      vTaskDelay(5);
-      getSpeed(dummy);
+      vTaskDelay(800);
+      PORTA ^= 0xE0;
    }
 }
 

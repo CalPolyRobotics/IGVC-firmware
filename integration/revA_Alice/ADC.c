@@ -37,10 +37,10 @@ static int ADCinitialized = 0;
  */
 void initADC(){
    //Uncomment when ADC is fixed
-	/*ADCSRA = _BV(ADEN);
+	ADCSRA = _BV(ADEN);
 	ADMUX = _BV(REFS0)|(1);
 
-	ADCSRB = (1 << MUX5);*/
+	ADCSRB = (1 << MUX5);
 	
 }
 
@@ -122,7 +122,7 @@ void vTaskADC(void *parameters){
 	}
 	
    //ADC currently broken. Using ADC on separate Arduino
-   /*currDevice = 0;
+   currDevice = 0;
 
 	while(1){
 		ADCStart(&devices[currDevice]);
@@ -131,9 +131,9 @@ void vTaskADC(void *parameters){
 		if(currDevice >= 16 || devices[currDevice].port == -1){
 			currDevice = 0;
 		}
-	}*/
+	}
    
-   unsigned int adcResult;
+   /*unsigned int adcResult;
 
    currDevice = 0;
    while(1) {
@@ -146,7 +146,7 @@ void vTaskADC(void *parameters){
       currDevice++;
       if(currDevice > 6 || devices[currDevice].port == -1) currDevice = 0;
       vTaskDelay(1);
-   }
+   }*/
 }
 
 /*
