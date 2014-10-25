@@ -53,6 +53,17 @@ int main(int argc, char** argv){
 
    //controller.setFNRForward();
 
+   while(1) {
+	controller.setFNRReverse();
+	usleep(5000000);
+	controller.setFNRNeutral();
+	usleep(5000000);
+	controller.setFNRReverse();
+	usleep(5000000);
+	controller.setFNRNeutral();
+	usleep(5000000);
+   }
+
    do {
 		//controller.getSpeed((char)FNRState);
       int i;
@@ -73,8 +84,8 @@ int main(int argc, char** argv){
       }
       //FNRState++;
       //if(FNRState == 2) FNRState = -1;
-      //usleep(atoi(argv[1]));
-      usleep(500);
+      usleep(atoi(argv[1]));
+      //usleep(ato);
    } while(1);
 
    //return 0;
