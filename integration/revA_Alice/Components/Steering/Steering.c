@@ -55,16 +55,12 @@ void getLinearPotCallback(int data,void *parameters){
  */
 void initializeSteeringTimer(){
 	
-   TCCR1A = (1 << WGM11)|(1 << WGM10)|(1 << COM1B1)|
-      (1 << COM1C1);
+   TCCR1A = (1 << WGM11)|(1 << WGM10)|(1 << COM1A1);
 	TCCR1B = (1 << WGM12)|(1 << CS10);
 	TCCR1C = 0;
 
-   OCR1BH = 0;
-   OCR1BL = 0;
-
-   OCR1CH = 0;
-   OCR1CL = 0;
+   OCR1AH = 0;
+   OCR1AL = 0;
 }
 
 /*
@@ -76,21 +72,16 @@ void initializeSteeringTimer(){
 void setSteeringPWMSpeed(int spd){
    if(spd > 0x3FF) spd = 0x3FF;
 
+   OCR1AH = spd >> 8;
+   OCR1AL = spd & 0xFF;
+
    if(steeringDir == -1) {
-      OCR1BH = 0;
-      OCR1BL = 0;
-      OCR1CH = spd >> 8;
-      OCR1CL = spd & 0xFF;
+      PORTB |= (1 << PB4);
    } else if(steeringDir == 1) {
-      OCR1BH = spd >> 8;
-      OCR1BL = spd & 0xFF;
-      OCR1CH = 0;
-      OCR1CL = 0;
+      PORTB &= ~(1 << PB4);
    } else {
-      OCR1BH = 0;
-      OCR1BL = 0;
-      OCR1CH = 0;
-      OCR1CL = 0;
+      OCR1AH = 0;
+      OCR1AL = 0;
    }
 }
 
@@ -174,20 +165,7 @@ void vTaskSteer(void* parameters){
 
 	addADCDevice(0,ADC_OPT_PRECISION_HIGH,getLinearPotCallback,NULL);
 
-   PORTJ &= ~(1 << 4);
    //initializeSteeringTimer();
-
-   OCR1BL = 0;
-   OCR1BH = 0x2;
-   OCR1CL = 0;
-   OCR1CH = 0;
-
-   OCR1AH = 1;
-   OCR1AL = 0;
-
-   while(1) {
-      vTaskDelay(200);
-   }
 
 	int pConst = 80; 
 	int adjust;
