@@ -101,13 +101,7 @@ void vTaskMain()
    initializeHallEffect();
 
    for(;;) {
-      //vTaskDelay(800);
-      //PORTA ^= 0xE0;
-      if(PINJ & (1 << PJ4)) {
-         PORTA |= 0xE0;
-      } else {
-         PORTA &= ~(0xE0); 
-      }
+      vTaskDelay(800);
    }
 }
 
