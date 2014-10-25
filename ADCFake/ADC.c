@@ -50,6 +50,12 @@ ISR(ADC_vect, ISR_NOBLOCK) {
    ADCResults[currDevice] = result;
 
    ADCSRA &= ~(_BV(ADEN));
+
+   if(currDevice == 0) {
+      printHex16(result);
+      printEndl();
+   }
+
    currDevice++;
    
    if(currDevice > 5){

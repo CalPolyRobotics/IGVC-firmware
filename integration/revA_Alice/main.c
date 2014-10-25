@@ -58,7 +58,7 @@ int main( void )
    DDRF = 0;
    DDRG = 0;
    DDRH = 0xFE;
-   //DDRJ = (1 << 1)|(1 << 4);
+   DDRJ = (1 << 1)|(1 << 4);
    DDRJ = 0xFF;
    DDRK = 0;
    DDRL = 0xF0;
@@ -102,7 +102,6 @@ void vTaskMain()
 
    for(;;) {
       vTaskDelay(800);
-      PORTA ^= 0xE0;
    }
 }
 

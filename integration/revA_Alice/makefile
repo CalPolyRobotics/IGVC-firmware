@@ -131,7 +131,7 @@ $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CFLAGS += -std=c89
 #CFLAGS += -std=gnu89
 #CFLAGS += -std=c99
-CFLAGS += -std=gnu99 -fdiagnostics-color=auto
+CFLAGS += -std=gnu99 
 
 
 

@@ -56,8 +56,9 @@ int main(int argc, char** argv){
    do {
 		//controller.getSpeed((char)FNRState);
       int i;
-      //controller.getHallEffectTicks();
-      controller.getSpeed();
+      controller.getHallEffectTicks();
+      //controller.getAngle();
+      //controller.getSpeed();
       //controller.getSonarAll();
       retPayload = controller.getResults();
       if(retPayload.payload){
