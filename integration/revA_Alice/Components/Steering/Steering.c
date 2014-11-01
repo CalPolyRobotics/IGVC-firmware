@@ -31,8 +31,12 @@
 
 #define STEERING_DELAY 270
 
+#define MAX_STEERING_CURRENT (.0659*4 + 2.53)
+#define MIN_STEERING_CURRENT (-.0659*4 + 2.53)
+
 static int steeringTarget;
 static int steeringValue;
+static int motorCurrent;
 
 static int steeringDir;
 
@@ -40,6 +44,7 @@ static int zeroCurrentDelay;
 
 void printWheelAngle(void);
 void getLinearPotCallback(int data, void *parameters);
+void getMotorCurrentCallback(int data, void *parameters);
 
 /*
  * The ADC callback for the linear encoder.
@@ -50,17 +55,20 @@ void getLinearPotCallback(int data,void *parameters){
    steeringValue = data;
 }
 
+void getMotorCurrentCallback(int data, void *parameters){
+   motorCurrent = data;
+   printNum(data);
+   USARTQueueBuf("\r\n", 2);
+}
+
 /*
  * Initialize the timing registers used to pwm the motor controllers.
  */
 void initializeSteeringTimer(){
 	
-   TCCR1A = (1 << WGM11)|(1 << WGM10)|(1 << COM1A1);
-	TCCR1B = (1 << WGM12)|(1 << CS10);
-	TCCR1C = 0;
-
-   OCR1AH = 0;
-   OCR1AL = 0;
+   TCCR1A = (1 << WGM11)|(1 << COM1A1);
+   TCCR1B = (1 << WGM12)|(1 << CS10)|(1 << CS11);
+   TCCR1C = 0;
 }
 
 /*
@@ -72,8 +80,15 @@ void initializeSteeringTimer(){
 void setSteeringPWMSpeed(int spd){
    if(spd > 0x3FF) spd = 0x3FF;
 
-   OCR1AH = spd >> 8;
-   OCR1AL = spd & 0xFF;
+   /*if(motorCurrent > MAX_STEERING_CURRENT
+      || motorCurrent < MIN_STEERING_CURRENT) {
+      spd = (spd*3) / 4;
+   }*/
+
+   //OCR1AH = spd >> 8;
+   //OCR1AL = spd & 0xFF;
+   OCR1AH = 1;
+   OCR1AL = 0x40;
 
    if(steeringDir == -1) {
       PORTB |= (1 << PB4);
@@ -164,27 +179,33 @@ void printWheelAngle() {
 void vTaskSteer(void* parameters){
 
 	addADCDevice(0,ADC_OPT_PRECISION_HIGH,getLinearPotCallback,NULL);
+   addADCDevice(2,ADC_OPT_PRECISION_HIGH,getMotorCurrentCallback,NULL);
 
-   //initializeSteeringTimer();
+   PORTB |= (1 << PB4);
 
-	int pConst = 80; 
-	int adjust;
+   initializeSteeringTimer();
+
+   OCR1AH = 0;
+   OCR1AL = 0;
+
+   int pConst = 80; 
+   int adjust;
    
    zeroCurrentDelay = 5;
 
 	steeringTarget = 277;
 	while(1){
-      
-	   adjust = pConst * (steeringTarget - steeringValue);
-	   if(adjust < steeringTarget - pConst){
-	      setSteeringDirection(-1);
+
+      adjust = pConst * (steeringTarget - steeringValue);
+      if(adjust < steeringTarget - pConst){
+         setSteeringDirection(-1);
          adjust *= -1;
 	   } else if (adjust > steeringTarget + pConst){
 	      setSteeringDirection(1);
 	   } else {
 	      setSteeringDirection(0);
 	   }
-
+   
       if(zeroCurrentDelay > 0){
          zeroCurrentDelay--;
          setSteeringPWMSpeed(((adjust + 140) / STEERING_DELAY) * (STEERING_DELAY - zeroCurrentDelay));
