@@ -17,20 +17,12 @@ int main(int argc, char** argv){
 	int successCount = 0,count = 0;
 	char input;
 	char FNRState;
-   char steerState;
+   int steerState;
 	unsigned char cartSpeed;
    ReturnPayload retPayload;
    bool runForever = argv[2][0] == '1';
 	
 	CaddyBoardControl controller;
-
-	Packet FNRPacket;
-	Packet speedPacket;
-   Packet steerPacket = {3, 1, 1, 0}; 
-	Packet sendPacket;
-	ReturnPayload results;
-
-	SerialComms atmega;
 
 	if(controller.initializeComms("/dev/ttyACM1",BAUD_RATE) != COMM_SUCCESS){
 		cout << "Unable to initialize Serial Connection\n";
@@ -39,36 +31,27 @@ int main(int argc, char** argv){
 
 	cout << "Connection Initialized" << endl;
 
-	FNRPacket.groupID = 4;
-	FNRPacket.cmd = 0;
-	FNRPacket.payloadSize = 1;
-	FNRPacket.payload = (unsigned char*)&FNRState;
+   controller.setFNRForward();
 
-	speedPacket.groupID = 2;
-	speedPacket.cmd = 1;
-	speedPacket.payloadSize = 1;
-	speedPacket.payload = &cartSpeed;
-
-   steerPacket.payload = (unsigned char*)&steerState;
-
-   //controller.setFNRForward();
+   //while(1);
 
    while(1) {
 	controller.setFNRReverse();
-	usleep(5000000);
+	usleep(3000000);
 	controller.setFNRNeutral();
-	usleep(5000000);
-	controller.setFNRReverse();
-	usleep(5000000);
+	usleep(3000000);
+	controller.setFNRForward();
+	usleep(3000000);
 	controller.setFNRNeutral();
-	usleep(5000000);
+	usleep(3000000);
    }
 
+   if(0) {
    do {
 		//controller.getSpeed((char)FNRState);
       int i;
-      controller.getHallEffectTicks();
-      //controller.getAngle();
+      //controller.getHallEffectTicks();
+      controller.getAngle();
       //controller.getSpeed();
       //controller.getSonarAll();
       retPayload = controller.getResults();
@@ -87,48 +70,31 @@ int main(int argc, char** argv){
       usleep(atoi(argv[1]));
       //usleep(ato);
    } while(1);
+   }
 
    //return 0;
       
-
 	while(scanf("%c",&input) != EOF){
 		count = 0;
 		switch(input){
-		case 'F':
-			FNRState = 1;
-			sendPacket = FNRPacket;
-			break;
-		case 'N':
-			FNRState = 0;
-			sendPacket = FNRPacket;
-			break;
-		case 'R':
-			FNRState = -1;
-			sendPacket = FNRPacket;
-			break;
-      case 'Y':
-         steerState = -30;        
-         sendPacket = steerPacket;
+		case 'Y':
+         steerState = 170;        
          controller.setAngle(steerState);
 		   break;
       case 'U':
-         steerState = -15;
-         sendPacket = steerPacket;
+         steerState = 225;
          controller.setAngle(steerState);
 		   break;
       case 'I':
-         steerState = 0;
-         sendPacket = steerPacket;
+         steerState = 274; 
          controller.setAngle(steerState);
 		   break;
       case 'O':
-         steerState = 26;
-         sendPacket = steerPacket;
+         steerState = 384;
          controller.setAngle(steerState);
 		   break;
       case 'P':
-         steerState = 35;
-         sendPacket = steerPacket;
+         steerState = 410;
          controller.setAngle(steerState);
 		   break;
 		case '0':

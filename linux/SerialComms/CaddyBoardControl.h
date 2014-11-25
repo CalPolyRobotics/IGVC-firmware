@@ -9,7 +9,7 @@ class CaddyBoardControl {
    ReturnPayload getResults() {return atmega.getResults();}
 
 	int setFNR(char direction);
-   int setAngle(char ang);
+   int setAngle(int ang);
    int getFNR();
    int getAngle();
    int getSpeed();

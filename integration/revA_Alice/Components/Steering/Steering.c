@@ -178,9 +178,10 @@ void printWheelAngle() {
  */
 void vTaskSteer(void* parameters){
 
-	addADCDevice(0,ADC_OPT_PRECISION_HIGH,getLinearPotCallback,NULL);
-   addADCDevice(2,ADC_OPT_PRECISION_HIGH,getMotorCurrentCallback,NULL);
+   
 
+	addADCDevice(0,ADC_OPT_PRECISION_HIGH,getLinearPotCallback,NULL);
+   
    PORTB |= (1 << PB4);
 
    initializeSteeringTimer();
@@ -215,6 +216,8 @@ void vTaskSteer(void* parameters){
       }
  
 	   vTaskDelay(10);
+
+
 	}
 
 }

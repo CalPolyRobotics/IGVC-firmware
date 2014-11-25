@@ -54,10 +54,10 @@ int CaddyBoardControl::setFNR(char direction){
 	}
 }
 
-int CaddyBoardControl::setAngle(char ang){
+int CaddyBoardControl::setAngle(int ang){
 
   int count = 0;
-	Packet FNRPacket = {3,1,1,0};
+	Packet FNRPacket = {3,1,2,0};
 	FNRPacket.payload = (unsigned char*)&ang;
 		
 	while(atmega.sendPacket(&FNRPacket) != COMM_SUCCESS){
