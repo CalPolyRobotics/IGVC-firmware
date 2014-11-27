@@ -10,8 +10,9 @@
  *  Created on: Nov 25, 2014
  *      Author: Robotics
  */
-
-
+#include "steering.h"
+#include  "global.h"
+#include "gio"
 
 void VTasksteering(void *pvParameters)
 {
@@ -20,8 +21,24 @@ void VTasksteering(void *pvParameters)
     for(;;)
     {
         /* Taggle HET[1] with timer tick */
-        gioSetBit(hetPORT1, 17, gioGetBit(hetPORT1, 17) ^ 1);
-        vTaskDelay(100);
+
+    	//locktirelocmutex
+    		// get latested tirloc
+    	// unlocktireloc mutex
+    	if(  ( targetval - tireloc) < 0 )
+    	{
+    		gioSetBit(gioPORTA,1 < STEERINGMDIRPIN,0)
+
+    	}
+    	else
+    	{
+    		gioSetBit(gioPORTA,1 < STEERINGMDIRPIN,1)
+
+
+    	}
+    	pwmSetDuty(hetRAM1,STEERINGPWM , STEERINGK*( targetval - tireloc) % 100))
+
+    	vTaskDelay(100);
     }
 }
 

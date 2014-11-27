@@ -13,8 +13,12 @@
  *      Author: Robotics
  */
 
+// steering constant
+#define STEERINGMDIRPIN 5
+#define STEERINGPWM pwm2
+#define STEERINGK 5.0
 
-
+#define FNR
 
 
 /* USER CODE END */

@@ -12,6 +12,13 @@
  *      Author: Robotics
  */
 
+volatile int targetval;
+SemaphoreHandle_t targetvalMutex;
+SemaphoreHandle_t targetvalUpdate;
+
+volatile int tireloc;
+SemaphoreHandle_t tirelocMutex;
+
 
 
 
