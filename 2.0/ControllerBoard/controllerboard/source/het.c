@@ -391,7 +391,7 @@ static const hetINSTRUCTION_t het1PROGRAM[58U] =
         /* Program */
         0x0002B440U,
         /* Control */
-        (0x0002A007U | (uint32)((uint32)15U << 8U) | (uint32)((uint32)1U << 4U)),
+        (0x0002A007U | (uint32)((uint32)15U << 8U) | (uint32)((uint32)3U << 4U)),
         /* Data */
         0x00000000U,
         /* Reserved */
@@ -1062,7 +1062,7 @@ void hetInit(void)
                   | (uint32)((uint32)0U << 16U)
                   | (uint32)((uint32)0U << 15U)
                   | (uint32)((uint32)0U << 14U)
-                  | (uint32)((uint32)0U << 13U)
+                  | (uint32)((uint32)1U << 13U)
                   | (uint32)((uint32)0U << 12U)
                   | (uint32)((uint32)0U << 11U)
                   | (uint32)((uint32)0U << 10U)

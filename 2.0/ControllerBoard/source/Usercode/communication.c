@@ -12,7 +12,14 @@ _/ ___\/  _ \ /     \ /     \|  |  \/    \|  |/ ___\\__  \ |  \   __\/  _ \ /   
  */
 
 #include "communication.h"
-#include "ssi.h"
+#include "sci.h"
+#include "FreeRTOS.h"
+#include "os_task.h"
+#include "fnr.h"
+#include "het.h"
+#include "steering.h"
+#include"os_semphr.h"
+
 
 char  data[100];
 // addtx queue
@@ -20,15 +27,18 @@ char  data[100];
 void sciNotification(sciBASE_t *sci, uint32 flags)
 {
 
-if(// if data is redy to be tranmitted )
+if(flags& SCI_RX_INT)
 		{
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(xSemaphoreSCIDataRX,&xHigherPriorityTaskWoken);
 
 	// unlock mutex
 		}
-if(/// if data is ready read)
+if(flags& SCI_TX_INT)
 		{
-	   // incremented counting semiphor
 
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(xSemaphoreSCIDataTX,&xHigherPriorityTaskWoken);
 		}
 
 
@@ -37,6 +47,9 @@ if(/// if data is ready read)
 
 void USARTQueueBuf(char *buf, int size) {
 // add to queue;
+	int i;
+	for( i = 0; i <  size; i++)
+    xQueueSendToBack(xTXQueue,buf+i,0);
 
 }
 
@@ -48,31 +61,27 @@ void USARTQueueVar(char data) {
 
 }
 
-void communicationtxtask()
+void  communicationTxtask(void *pvParameters)
 {
+
+
 	while(1)
 	{
-		if(//data data on queue )
-				{
-			if(/ and mutex not set)
-			{
-				for(int i = 0 ; i < 100; i++)
-			 {
-				 if( queue is empty )
-					 break;
-				 data[i] = // deque data from queue
-
-
-			 }
-				// set mutex
-				sciSendByte(,buf,size)
-
-			}
-				}
-
+    unsigned char  a =0;
+    xQueueReceive(xTXQueue,&a,portMAX_DELAY);
+    sciSendByte(scilinREG,a);
+	//xSemaphoreTake(xSemaphoreSCIDataTX,portMAX_DELAY);
 
 	}
 
+
+}
+void comsetup()
+{
+	xTXQueue= xQueueCreate(100,sizeof(uint8_t));
+		vSemaphoreCreateBinary(xSemaphoreSCIDataTX);
+	xRXQueue= xQueueCreate(100,sizeof(uint8_t));
+		vSemaphoreCreateBinary(xSemaphoreSCIDataRX);
 
 }
 
@@ -82,25 +91,10 @@ void communicationRxtask(void *pvParameters)
 
 for(;; )
 {
-// block if the counting semiphore does not have data
-if()
-{
-	// copy over 100 bytes or the  counting semiphore size
-	 // decremented counting semiphore
-	// lock rx mutex trsnation
-     // perform  rx mutex tranation
+	sciReceive(scilinREG,1,&RXdata);
 
-	if(/// is transation mutex unlocked  block )
-			{
-
-		for(int i = 0; i < amount of data ;  i++)
-		{
-	         /// enqueue data;
-		}
-
-	// unlock transation
-			}
-}
+	xSemaphoreTake(xSemaphoreSCIDataRX,portMAX_DELAY);
+    xQueueSendToBack(xRXQueue,&RXdata,0);
 
 
 }
@@ -144,11 +138,12 @@ char processSpeedCommand(char commandCode, void* commandData, Response* response
          break;
       case SET_SPEED:
 			//responseData->size = 0;
-         setSpeed(((char*)commandData)[0]);
+         //setSpeed(((char*)commandData)[0]);
          break;
       case GET_TICKS:
-         //responseData->size = 2;
-         //getTicks((unsigned char*) responseData->payload);
+          responseData->size = 4;
+		  uint32 * output =  (uint32 *)responseData->payload ;
+          *output= edgeGetCounter(hetRAM1, edge6);
          break;
    }
    return 1;
@@ -161,11 +156,22 @@ char processSteeringCommand(char commandCode, void* commandData, Response* respo
 
    switch(commandCode) {
       case SET_ANGLE:
-         setAngle(((unsigned char*)commandData));
+
+    	xSemaphoreTake(targetvalMutex, portMAX_DELAY);
+    	targetval= ((unsigned int)commandData);
+      	xSemaphoreGive(targetvalMutex);
+
+        // setAngle(((unsigned char*)commandData));
 	      //responseData->size = 0;
          break;
       case GET_ANGLE:
-        // responseData->size = 2;
+        responseData->size = 2;
+    	xSemaphoreTake(tirelocMutex, portMAX_DELAY);
+    	responseData->payload[0]= tireloc&0xff;
+    	responseData->payload[1]= (tireloc >> 8)&0xff;
+	    xSemaphoreGive(tirelocMutex);
+
+
         // getAngle((unsigned char*) responseData->payload);
          break;
       case GET_DESIRED_ANGLE:
@@ -192,7 +198,12 @@ char processFNRCommand(char commandCode, void* commandData, Response* responseDa
    switch(commandCode) {
       case SET_FNR:
 	      responseData->size = 0;
-         //setFNR(*((char*)commandData));
+	      xSemaphoreTake(FNRMutex, portMAX_DELAY);
+	      FNRstate = ((char *)commandData)[0];
+	      xSemaphoreGive(FNRMutex);
+	      xSemaphoreGive(FNRUpdate);
+
+         //setFNR(*((char*)commandData));0
          break;
       case GET_FNR:
          responseData->size = 1;
@@ -259,14 +270,14 @@ char processCommand(Command* command, Response* response) {
          //processUltrasonicCommand(command->cmd, command->payload, response);
          break;
       case SPEED_GROUP:
-			//processSpeedCommand(command->cmd,command->payload,response);
+			processSpeedCommand(command->cmd,command->payload,response);
          break;
       case STEERING_GROUP:
          //PORTC = response->commandBack;
-         //processSteeringCommand(command->cmd,command->payload,response);
+         processSteeringCommand(command->cmd,command->payload,response);
          break;
       case FNR_GROUP:
-			//processFNRCommand(command->cmd,command->payload,response);
+			processFNRCommand(command->cmd,command->payload,response);
          break;
       case BRAKES_GROUP:
          /*do brakes things*/
@@ -294,8 +305,8 @@ void runSerialFSM(unsigned char data) {
     static Command command;
     static Response response;
 
-    if(xTaskGetTickCount() - oldCount >= TIMEOUT) {
-        bytesRecieved = 0;
+    if(xTaskGetTickCount() - oldCount >= 5000) {
+       bytesRecieved = 0;
         FSMState = RecvHeader;
     }
 
@@ -436,17 +447,15 @@ void sendNACK() {
 
 void VTaskCommuncation(void *pvParameters)
 {
-    xSemaphore = xSemaphoreCreateBinary();
 
     for(;;)
     {
+    	uint8_t byte;
       /// check if there is data on the queue
-      if()
-      {
-    	  // data left on the queue
-    	while()
-    	runSerialFSM(unsigned char data)
-      }
+        xQueueReceive(xRXQueue,&byte,portMAX_DELAY);
+
+    	runSerialFSM(byte);
+
     }   
 }
 

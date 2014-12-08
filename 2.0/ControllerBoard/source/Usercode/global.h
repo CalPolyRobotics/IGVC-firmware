@@ -14,11 +14,14 @@
  */
 
 // steering constant
-#define STEERINGMDIRPIN 5
+#define STEERINGMDIRPIN 2
 #define STEERINGPWM pwm2
 #define STEERINGK 5.0
 
-#define FNR
+//fnr constants
+#define FNRENABLE 14
+#define FNRDIR 16
+
 
 
 /* USER CODE END */

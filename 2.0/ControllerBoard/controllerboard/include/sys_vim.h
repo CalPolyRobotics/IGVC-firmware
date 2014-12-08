@@ -62,6 +62,8 @@ extern void vPortPreemptiveTick(void);
 extern void het1HighLevelInterrupt(void);
 extern void phantomInterrupt(void);
 extern void linHighLevelInterrupt(void);
+extern void adc1Group0Interrupt(void);
+extern void adc1Group1Interrupt(void);
 extern void spi2HighLevelInterrupt(void);
 extern void vPortYeildWithinAPI(void);
 extern void het1LowLevelInterrupt(void);
@@ -245,8 +247,8 @@ typedef struct vim_config_reg
                                     |(uint32)((uint32)1U << 11U)\
                                     |(uint32)((uint32)0U << 12U)\
                                     |(uint32)((uint32)1U << 13U)\
-                                    |(uint32)((uint32)0U << 14U)\
-                                    |(uint32)((uint32)0U << 15U)\
+                                    |(uint32)((uint32)1U << 14U)\
+                                    |(uint32)((uint32)1U << 15U)\
                                     |(uint32)((uint32)0U << 16U)\
                                     |(uint32)((uint32)1U << 17U)\
                                     |(uint32)((uint32)0U << 18U)\

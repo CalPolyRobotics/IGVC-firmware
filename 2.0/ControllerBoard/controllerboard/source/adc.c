@@ -63,7 +63,7 @@ void adcInit(void)
     */
     adcREG1->GxMODECR[0U] = (uint32)ADC_12_BIT
                           | (uint32)0x00000000U
-                          | (uint32)0x00000000U;
+                          | (uint32)0x00000002U;
 
     /** - Setup event group hardware trigger
      *     - Setup hardware trigger edge
@@ -90,7 +90,7 @@ void adcInit(void)
     adcREG1->GxMODECR[1U] = (uint32)ADC_12_BIT
                           | (uint32)0x00000000U
                           | (uint32)0x00000000U
-                          | (uint32)0x00000000U;
+                          | (uint32)0x00000002U;
 
     /** - Setup group 1 hardware trigger
      *     - Setup hardware trigger edge
@@ -201,11 +201,11 @@ static const uint32 s_adcSelect[1U][3U] =
     0x00000000U |
     0x00000000U |
     0x00000000U,
+    0x00000001U |
     0x00000000U |
     0x00000000U |
     0x00000000U |
-    0x00000000U |
-    0x00000000U |
+    0x00000010U |
     0x00000000U |
     0x00000000U |
     0x00000000U |
@@ -882,7 +882,51 @@ void adc1GetConfigValue(adc_config_reg_t *config_reg, config_value_type_t type)
 /* USER CODE BEGIN (35) */
 /* USER CODE END */
 
+/** @fn void adc1Group0Interrupt(void)
+*   @brief ADC1 Event Group Interrupt Handler
+*/
+#pragma CODE_STATE(adc1Group0Interrupt, 32)
+#pragma INTERRUPT(adc1Group0Interrupt, IRQ)
 
+/* SourceId : ADC_SourceId_014 */
+/* DesignId : ADC_DesignId_013 */
+/* Requirements : HL_SR197, HL_SR196 */
+void adc1Group0Interrupt(void)
+{
+/* USER CODE BEGIN (36) */
+/* USER CODE END */
+    
+    adcREG1->GxINTFLG[0U] = 9U;
+
+    adcNotification(adcREG1, adcGROUP0);
+
+/* USER CODE BEGIN (37) */
+/* USER CODE END */
+}
+
+/* USER CODE BEGIN (38) */
+/* USER CODE END */
+/** @fn void adc1Group1Interrupt(void)
+*   @brief ADC1 Group 1 Interrupt Handler
+*/
+#pragma CODE_STATE(adc1Group1Interrupt, 32)
+#pragma INTERRUPT(adc1Group1Interrupt, IRQ)
+
+/* SourceId : ADC_SourceId_015 */
+/* DesignId : ADC_DesignId_013 */
+/* Requirements : HL_SR197, HL_SR196 */
+void adc1Group1Interrupt(void)
+{
+/* USER CODE BEGIN (39) */
+/* USER CODE END */
+    
+    adcREG1->GxINTFLG[1U] = 9U;
+
+    adcNotification(adcREG1, adcGROUP1);
+
+/* USER CODE BEGIN (40) */
+/* USER CODE END */
+}
 
 
 /* USER CODE BEGIN (44) */

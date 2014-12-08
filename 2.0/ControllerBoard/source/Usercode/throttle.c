@@ -13,13 +13,10 @@ _/  |_|  |_________  _____/  |__/  |_|  |   ____
  */
 void VTaskthrottle(void *pvParameters)
 {
-    xSemaphore = xSemaphoreCreateBinary();
 
     for(;;)
     {
-        /* Taggle HET[1] with timer tick */
-        gioSetBit(hetPORT1, 17, gioGetBit(hetPORT1, 17) ^ 1);
-        vTaskDelay(100);
+
     }
 }
 

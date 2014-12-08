@@ -12,9 +12,14 @@ _/ ___\/  _ \ /     \ /     \|  |  \/    \|  |/ ___\\__  \ |  \   __\/  _ \ /   
  *  Created on: Nov 25, 2014
  *      Author: Robotics,  Louie Thiros , Michael Roberts
  */
-
+#include "FreeRTOS.h"
+#include "os_task.h"
+#include"os_semphr.h"
+typedef unsigned char  uint8_t;
 #define MAX_PAYLOAD_SIZE 32
-
+#define NACK_BYTE 0x5A
+#define ACK_BYTE	128
+#define TIMEOUT 5
 #define ULTRASONIC_GROUP 0x01
 #define SPEED_GROUP 0x02
 #define STEERING_GROUP 0x03
@@ -99,9 +104,16 @@ typedef enum {RecvHeader, RecvPayload, SendHeaderACK, SendPayloadACK} ReadState;
 extern int globalTickCount;
 
 
-
+void communicationTxtask(void *pvParameters);
+void communicationRxtask(void *pvParameters);
+void comsetup();
 void VTaskCommuncation(void *pvParameters);
-SemaphoreHandle_t xSemaphoreSCIDataready;
+SemaphoreHandle_t xSemaphoreSCIDataRX;
+SemaphoreHandle_t xSemaphoreSCIDataTX;
+SemaphoreHandle_t xRXQueue;
+SemaphoreHandle_t xTXQueue;
+uint8_t RXdata;
+uint8_t TXdata;
 
 
 

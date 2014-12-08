@@ -62,7 +62,7 @@ void sciInit(void)
                     | (uint32)((uint32)1U << 1U);  /* asynchronous timing mode */
                     
     /** - set baudrate */
-    scilinREG->BRS = 520U;  /* baudrate */
+    scilinREG->BRS = 42U;  /* baudrate */
 
     /** - transmission length */
     scilinREG->FORMAT = 8U - 1U;  /* length */
@@ -115,7 +115,7 @@ void sciInit(void)
                       | (uint32)((uint32)1U);  /* Break detect */
 
     /** - initialize global transfer variables */
-    g_sciTransfer_t.mode      = (uint32)0U << 8U;
+    g_sciTransfer_t.mode      = (uint32)1U << 8U;
     g_sciTransfer_t.tx_length = 0U;
 	g_sciTransfer_t.rx_length = 0U;
 
