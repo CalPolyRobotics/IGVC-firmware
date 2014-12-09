@@ -16,7 +16,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#define USART_DELAY 200
+#define USART_DELAY 10000
 
 using namespace std;
 

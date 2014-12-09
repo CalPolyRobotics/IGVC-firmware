@@ -1,7 +1,0 @@
-Cal Poly Robotics Club - IGVC firmware
-
-The firmware for the IGVC autonomous golf cart project.
-
-The code was built for the ATmega2560, but should work with slight modification for most ATmega chips.
-
-Uses the FreeRTOS Real Time Operating System to provide tasks, as well as semaphores and mutexes. See FreeRTOS.org

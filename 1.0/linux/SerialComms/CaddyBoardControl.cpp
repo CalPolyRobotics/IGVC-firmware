@@ -4,7 +4,7 @@
 #include <iostream>
 #include "unistd.h"
 
-#define RETRY_TIME 4000
+#define RETRY_TIME 100
 
 int CaddyBoardControl::sendCommand(Packet *packet) {
 
@@ -57,7 +57,7 @@ int CaddyBoardControl::setFNR(char direction){
 int CaddyBoardControl::setAngle(int ang){
 
   int count = 0;
-	Packet FNRPacket = {3,1,2,0};
+	Packet FNRPacket = {3,1,4,0};
 	FNRPacket.payload = (unsigned char*)&ang;
 		
 	while(atmega.sendPacket(&FNRPacket) != COMM_SUCCESS){

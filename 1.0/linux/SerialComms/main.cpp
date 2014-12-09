@@ -24,7 +24,7 @@ int main(int argc, char** argv){
 	
 	CaddyBoardControl controller;
 
-	if(controller.initializeComms("/dev/ttyACM1",BAUD_RATE) != COMM_SUCCESS){
+	if(controller.initializeComms("/dev/ttyUSB0",BAUD_RATE) != COMM_SUCCESS){
 		cout << "Unable to initialize Serial Connection\n";
 		return 1;
 	}	
@@ -33,18 +33,28 @@ int main(int argc, char** argv){
 
    controller.setFNRForward();
 
+
    //while(1);
 
    while(1) {
-	controller.setFNRReverse();
-	usleep(3000000);
-	controller.setFNRNeutral();
-	usleep(3000000);
-	controller.setFNRForward();
-	usleep(3000000);
-	controller.setFNRNeutral();
-	usleep(3000000);
-   }
+
+std::cout << "n\n";
+
+controller.getHallEffectTicks();
+	//controller.setFNRNeutral();
+	usleep(100000);
+
+     retPayload = controller.getResults();
+    printf("%u\n", (unsigned int)retPayload.payload[0] *16777216 +retPayload.payload[1] * 65536 +retPayload.payload[2] * 256 + retPayload.payload[3]);
+
+	usleep(100000);
+     controller.getAngle();  
+	usleep(100000);
+         controller.setAngle(1000);
+	usleep(100000);
+  retPayload = controller.getResults(); 
+        printf("%u\n", (unsigned int)retPayload.payload[1] * 256 + retPayload.payload[0]);
+}
 
    if(0) {
    do {

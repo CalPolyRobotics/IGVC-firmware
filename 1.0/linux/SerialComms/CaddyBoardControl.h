@@ -21,7 +21,7 @@ class CaddyBoardControl {
 	
 	int setFNRForward() {return setFNR(1);}
 	int setFNRNeutral() {return setFNR(0);}
-	int setFNRReverse() {return setFNR(-1);}
+	int setFNRReverse() {return setFNR(2);}
    
    int steerCenter() {return setAngle(0);}
 
