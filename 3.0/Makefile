@@ -14,7 +14,8 @@ SOURCES += $(PERIPH)/src/stm32f30x_gpio.c \
 		   $(PERIPH)/src/stm32f30x_spi.c \
 		   $(PERIPH)/src/stm32f30x_exti.c \
 		   $(PERIPH)/src/stm32f30x_syscfg.c \
-		   $(PERIPH)/src/stm32f30x_misc.c
+		   $(PERIPH)/src/stm32f30x_misc.c \
+		   $(PERIPH)/src/stm32f30x_usart.c
 
 SOURCES += startup_stm32f30x.s
 SOURCES += stm32f30x_it.c
