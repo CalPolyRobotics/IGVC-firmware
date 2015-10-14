@@ -23,6 +23,10 @@ SOURCES += system_stm32f30x.c
 
 SOURCES += main.c
 
+SOURCES += utils/buffer8.c
+
+SOURCES += drivers/usart.c
+
 OBJECTS = $(addprefix $(BUILDDIR)/, $(addsuffix .o, $(basename $(SOURCES))))
 
 INCLUDES += -I$(DEVICE)/include \
@@ -31,6 +35,8 @@ INCLUDES += -I$(DEVICE)/include \
 			-I$(DISCOVERY)/include \
 			-I$(USB)/include \
 			-I\
+			-Iutils\
+			-Idrivers\
 
 ELF = $(BUILDDIR)/program.elf
 HEX = $(BUILDDIR)/program.hex

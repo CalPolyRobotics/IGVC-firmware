@@ -38,5 +38,5 @@ void PendSV_Handler(void)
 
 void SysTick_Handler(void)
 {
-    //Timer_Decrement();
+   Timer_Decrement();
 }
