@@ -42,23 +42,13 @@ void buffer8_write(buffer8_t* buffer, uint8_t* data, uint32_t len)
    __disable_irq();
    if (buffer8_space(buffer) >= len)
    {
-      uint32_t main = buffer->size - (buffer->start - buffer->base);
-      if (main > len) {
-         main = len;
-      }
-      uint32_t remain = len - main;
-      while (main--)
+      while (len--)
       {
          *buffer->start++ = *data++;
-      } 
-
-      if (buffer->start == buffer->base + buffer->size)
-      {
-         buffer->start = buffer->base;
-      }
-      while (remain--)
-      {
-         *buffer->start++ = *data++;
+         if (buffer->start > (buffer->base + buffer->size))
+         {
+            buffer->start = buffer->base;
+         }
       }
    }
    __enable_irq();
