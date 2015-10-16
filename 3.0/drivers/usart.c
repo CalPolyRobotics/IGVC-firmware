@@ -48,7 +48,6 @@ void initIGVCUsart()
   NVIC_SetPriority(USART1_IRQn, 2);
   NVIC_EnableIRQ(USART1_IRQn);
 
-
   USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
   USART_Cmd(USART1, ENABLE);
 
@@ -93,6 +92,24 @@ void usartPrint(char* data)
    usartWrite(data, strlen(data));
 }
 
+uint8_t usartGet()
+{
+   return buffer8_get(&rxFifo);
+}
+
+void usartRead(uint8_t* buf, uint32_t bytes)
+{
+   while (bytes--)
+   {
+      *buf++ = usartGet();
+   }
+}
+
+uint32_t usartHaveBytes()
+{
+   return buffer8_bytes(&rxFifo);
+}
+
 void USART1_IRQHandler()
 {
    if (USART_GetITStatus(USART1, USART_IT_TXE) != RESET)
@@ -102,12 +119,12 @@ void USART1_IRQHandler()
          USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
       } else {
          uint8_t data = buffer8_get(&txFifo);
-         if (data == 'h')
-         {
-            STM_EVAL_LEDToggle(LED5);
-         }
-         USART1->TDR = data;//buffer8_get(&txFifo);
+         USART1->TDR = data;
       }
+      USART_ClearITPendingBit(USART1, USART_IT_TXE);
+   } else if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
+      STM_EVAL_LEDToggle(LED5);
+      buffer8_put(&rxFifo, USART1->RDR);
    }
-   USART_ClearITPendingBit(USART1, USART_IT_TXE);
 }
+

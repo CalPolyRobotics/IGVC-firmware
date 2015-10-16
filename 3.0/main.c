@@ -25,6 +25,16 @@ int main()
 
   SysTick_Config(SystemCoreClock / 1000);
 
+  while(1)
+  {
+    uint32_t bytes;
+    uint8_t data[32];
+    if ((bytes = usartHaveBytes()) > 5)
+    {
+      usartRead(data, bytes);
+      usartWrite(data, bytes);
+    }
+  }
 
   while(1)
   {
@@ -32,56 +42,6 @@ int main()
     //usartPut('1');
     Delay(100);
   }
-
-
-  while (1)
-  {
-    uint16_t data;
-    if (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) != RESET)
-    {
-      data = USART_ReceiveData(USART1);
-
-      //while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-      USART_SendData(USART1, data);
-    }
-
-
-  }
-
-
-  GPIO_SetBits(GPIOA, GPIO_Pin_9);
-
-
-
-
-    /*STM_EVAL_LEDInit(LED3);
-    STM_EVAL_LEDInit(LED4);
-    STM_EVAL_LEDInit(LED5);
-    STM_EVAL_LEDInit(LED6);
-    STM_EVAL_LEDInit(LED7);
-    STM_EVAL_LEDInit(LED8);
-    STM_EVAL_LEDInit(LED9);
-    STM_EVAL_LEDInit(LED10);*/
-
-    if (SysTick_Config(SystemCoreClock / 1000))
-    { 
-        while (1);
-    }
-
-    while (1) {
-        GPIO_SetBits(GPIOA, GPIO_Pin_9);
-        /*STM_EVAL_LEDToggle(LED3);
-        STM_EVAL_LEDToggle(LED4);
-        STM_EVAL_LEDToggle(LED5);
-        STM_EVAL_LEDToggle(LED6);
-        STM_EVAL_LEDToggle(LED7);
-        STM_EVAL_LEDToggle(LED8);
-        STM_EVAL_LEDToggle(LED9);
-        STM_EVAL_LEDToggle(LED10);*/
-        Delay(100);
-        GPIO_ResetBits(GPIOA, GPIO_Pin_9);
-        Delay(100);
-    }
 }
 
 /*void USART1_IRQHandler()
