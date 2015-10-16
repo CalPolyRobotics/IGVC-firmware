@@ -25,14 +25,11 @@ int main()
 
   SysTick_Config(SystemCoreClock / 1000);
 
-  STM_EVAL_LEDOff(LED5);
-
 
   while(1)
   {
-    usartPrint("Hello World!!!\r\n");
+    usartPrint("STM32\r\n");
     //usartPut('1');
-    STM_EVAL_LEDToggle(LED4);
     Delay(100);
   }
 
