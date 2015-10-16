@@ -35,7 +35,34 @@ void buffer8_put(buffer8_t* buffer, uint8_t data)
       }
    }
    __enable_irq();
-} 
+}
+
+void buffer8_write(buffer8_t* buffer, uint8_t* data, uint32_t len)
+{
+   __disable_irq();
+   if (buffer8_space(buffer) >= len)
+   {
+      uint32_t main = buffer->size - (buffer->start - buffer->base);
+      if (main > len) {
+         main = len;
+      }
+      uint32_t remain = len - main;
+      while (main--)
+      {
+         *buffer->start++ = *data++;
+      } 
+
+      if (buffer->start == buffer->base + buffer->size)
+      {
+         buffer->start = buffer->base;
+      }
+      while (remain--)
+      {
+         *buffer->start++ = *data++;
+      }
+   }
+   __enable_irq();
+}
 
 uint8_t buffer8_get(buffer8_t* buffer)
 {
@@ -58,9 +85,9 @@ uint32_t buffer8_space(buffer8_t* buffer)
 {
    if (buffer->start >= buffer->end)
    {
-      return buffer->start - buffer->end;
+      return buffer->size - (buffer->start - buffer->end);
    } else {
-      return buffer->size - (buffer->end - buffer->start);
+      return buffer->end - buffer->start;
    }
 }
 

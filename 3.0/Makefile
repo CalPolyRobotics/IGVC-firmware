@@ -49,7 +49,7 @@ OBJCOPY = arm-none-eabi-objcopy
  	
 CFLAGS  = -O0 -g -Wall -I.\
    -mcpu=cortex-m4 -mthumb \
-   -mfpu=fpv4-sp-d16 -mfloat-abi=hard \
+   -mfloat-abi=soft \
    $(INCLUDES) -DUSE_STDPERIPH_DRIVER
 
 LDSCRIPT = stm32_flash.ld
