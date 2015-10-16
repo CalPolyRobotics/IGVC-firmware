@@ -12,6 +12,7 @@ typedef struct {
 
 void buffer8_init(buffer8_t* buffer, uint8_t* base, uint32_t size);
 void buffer8_put(buffer8_t* buffer, uint8_t data);
+void buffer8_write(buffer8_t* buffer, uint8_t* data, uint32_t len);
 uint8_t buffer8_get(buffer8_t* buffer);
 uint32_t buffer8_space(buffer8_t* buffer);
 uint8_t buffer8_empty(buffer8_t* buffer);

@@ -1,3 +1,6 @@
+
+#include <string.h>
+
 #include "main.h"
 
 #include "utils/buffer8.h"
@@ -55,6 +58,12 @@ void initIGVCUsart()
 
 void usartPut(uint8_t data)
 {
+
+   //while( USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+   //USART_SendData(USART1, data);
+
+   //return;
+
    if(USART1->CR1 & USART_CR1_TXEIE)
    {
       buffer8_put(&txFifo, data);
@@ -66,18 +75,21 @@ void usartPut(uint8_t data)
 
 void usartWrite(uint8_t* data, uint32_t size)
 {
-   while(size--)
+   if (USART1->CR1 & USART_CR1_TXEIE)
    {
-      usartPut(*data++);
+      buffer8_write(&txFifo, data, size);
+   } else {
+      buffer8_write(&txFifo, data + 1, size - 1);
+      __disable_irq();
+      USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+      USART1->TDR = *data;
+      __enable_irq();
    }
 }
 
 void usartPrint(char* data)
 {
-   while(*data)
-   {
-      usartPut(*data++);
-   }
+   usartWrite(data, strlen(data));
 }
 
 void USART1_IRQHandler()
@@ -87,9 +99,10 @@ void USART1_IRQHandler()
       if (buffer8_empty(&txFifo))
       {
          USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
-         USART_ClearITPendingBit(USART1, USART_IT_TXE);
       } else {
+         STM_EVAL_LEDOn(LED5);
          USART1->TDR = buffer8_get(&txFifo);
       }
    }
+   USART_ClearITPendingBit(USART1, USART_IT_TXE);
 }

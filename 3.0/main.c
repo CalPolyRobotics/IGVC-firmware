@@ -21,14 +21,16 @@ int main()
   initIGVCUsart();
 
   STM_EVAL_LEDInit(LED4);
+  STM_EVAL_LEDInit(LED5);
 
   SysTick_Config(SystemCoreClock / 1000);
 
+  STM_EVAL_LEDOff(LED5);
 
 
   while(1)
   {
-    usartWrite("Hello World!!!\r\n", 4);
+    usartPrint("Hello World!!!\r\n");
     //usartPut('1');
     STM_EVAL_LEDToggle(LED4);
     Delay(100);
