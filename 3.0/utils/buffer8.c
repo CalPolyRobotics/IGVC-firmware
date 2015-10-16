@@ -4,16 +4,6 @@
 
 #include "buffer8.h"
 
-/*void inline __disable_irq()
-{
-   asm volatile ("cpsie i");
-}
-
-void inline __enable_irq()
-{
-   asm volatile ("cpsid i");
-}*/
-
 void buffer8_init(buffer8_t* buffer, uint8_t* base, uint32_t size)
 {
    buffer->base = base;
@@ -79,6 +69,11 @@ uint32_t buffer8_space(buffer8_t* buffer)
    } else {
       return buffer->end - buffer->start;
    }
+}
+
+uint32_t buffer8_bytes(buffer8_t* buffer)
+{
+   return buffer->size - buffer8_space(buffer);
 }
 
 uint8_t buffer8_empty(buffer8_t* buffer)

@@ -25,6 +25,16 @@ int main()
 
   SysTick_Config(SystemCoreClock / 1000);
 
+  while(1)
+  {
+    uint32_t bytes;
+    uint8_t data[32];
+    if ((bytes = usartHaveBytes()) > 5)
+    {
+      usartRead(data, bytes);
+      usartWrite(data, bytes);
+    }
+  }
 
   while(1)
   {
@@ -32,7 +42,6 @@ int main()
     //usartPut('1');
     Delay(100);
   }
-
 
   while (1)
   {
