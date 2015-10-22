@@ -74,7 +74,6 @@ void usartPut(uint8_t data)
 
 void usartWrite(uint8_t* data, uint32_t size)
 {
-   STM_EVAL_LEDToggle(LED4);
    if (USART1->CR1 & USART_CR1_TXEIE)
    {
       buffer8_write(&txFifo, data, size);
@@ -123,7 +122,6 @@ void USART1_IRQHandler()
       }
       USART_ClearITPendingBit(USART1, USART_IT_TXE);
    } else if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
-      STM_EVAL_LEDToggle(LED5);
       buffer8_put(&rxFifo, USART1->RDR);
    }
 }

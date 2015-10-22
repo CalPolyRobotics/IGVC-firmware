@@ -2,6 +2,7 @@
 
 #include "usart.h"
 #include "utils/buffer8.h"
+#include "comms.h"
 
 static uint16_t __timer = 0;
 
@@ -22,14 +23,21 @@ int main()
 
   STM_EVAL_LEDInit(LED4);
   STM_EVAL_LEDInit(LED5);
+  STM_EVAL_LEDInit(LED6);
+  STM_EVAL_LEDInit(LED7);
+
+  STM_EVAL_LEDOff(LED6);
+  STM_EVAL_LEDOff(LED7);
 
   SysTick_Config(SystemCoreClock / 1000);
 
   while (1)
   {
-     printf("Hello Newlib!\r\n");
-     Delay(100);
-  }
+    if (usartHaveBytes())
+    {
+       runCommsFSM(usartGet());
+    }
+  } 
 
   while(1)
   {

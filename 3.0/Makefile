@@ -28,6 +28,8 @@ SOURCES += utils/buffer8.c
 
 SOURCES += drivers/usart.c
 
+SOURCES += app/comms.c
+
 OBJECTS = $(addprefix $(BUILDDIR)/, $(addsuffix .o, $(basename $(SOURCES))))
 
 INCLUDES += -I$(DEVICE)/include \
@@ -35,9 +37,10 @@ INCLUDES += -I$(DEVICE)/include \
 			-I$(PERIPH)/include \
 			-I$(DISCOVERY)/include \
 			-I$(USB)/include \
-			-I\
 			-Iutils\
 			-Idrivers\
+			-Iapp\
+			-I\
 
 ELF = $(BUILDDIR)/program.elf
 HEX = $(BUILDDIR)/program.hex
