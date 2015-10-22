@@ -61,6 +61,16 @@ uint8_t buffer8_get(buffer8_t* buffer)
    return retVal;
 }
 
+uint8_t buffer8_peek(buffer8_t* buffer)
+{
+   if(!buffer8_empty(buffer))
+   {
+      return *buffer->end;
+   } else {
+      return 0;
+   }
+}
+
 uint32_t buffer8_space(buffer8_t* buffer)
 {
    if (buffer->start >= buffer->end)
