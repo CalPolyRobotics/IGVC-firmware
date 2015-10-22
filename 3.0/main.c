@@ -25,6 +25,12 @@ int main()
 
   SysTick_Config(SystemCoreClock / 1000);
 
+  while (1)
+  {
+     printf("Hello Newlib!\r\n");
+     Delay(100);
+  }
+
   while(1)
   {
     uint32_t bytes;

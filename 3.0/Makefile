@@ -20,6 +20,7 @@ SOURCES += $(PERIPH)/src/stm32f30x_gpio.c \
 SOURCES += startup_stm32f30x.s
 SOURCES += stm32f30x_it.c
 SOURCES += system_stm32f30x.c
+SOURCES += newlib_hooks.c
 
 SOURCES += main.c
 
@@ -54,6 +55,8 @@ CFLAGS  = -O0 -g -Wall -I.\
 
 LDSCRIPT = stm32_flash.ld
 LDFLAGS += -T$(LDSCRIPT) -mthumb -mcpu=cortex-m4 -nostdlib
+
+LDLIBS += -lc -lm -lnosys
 
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
