@@ -143,6 +143,8 @@ int main()
         STM_EVAL_LEDToggle(LED8);
         STM_EVAL_LEDToggle(LED9);
         */
+        STM_EVAL_LEDToggle(LED10);
+        Delay(500);
     }
 }
 
