@@ -3,9 +3,9 @@
 import serial
 import time
 
-packet = bytearray(['A','B',0,1,0,6])
+packet = bytearray(['A','B',0,4,0,7, 3])
 
-ser = serial.Serial('/dev/cu.usbserial-AI02L70U', 115200, timeout=0)
+ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=0)
 
 ser.write(packet)
 

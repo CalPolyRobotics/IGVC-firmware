@@ -19,6 +19,17 @@
 #define START_BYTE_1 'A'
 #define START_BYTE_2 'B'
 
+
+#define PWM_GPIO GPIOC
+#define PWM_GPIO_EN RCC_AHBENR_GPIOCEN
+#define PWM_TIM_EN RCC_APB1ENR_TIM3EN
+#define PWM_TIM TIM3
+#define PWM_PERIOD_ARR 600
+#define PWM_PERIOD_PSC 6000
+#define PWM_DEFAULT_DUTY 2
+#define CLOCK_SPEED 72000000
+
+
 typedef enum {
     WAITING_FOR_START_1 = 0,
     WAITING_FOR_START_2,
@@ -45,12 +56,14 @@ void toggleLED2(Packet_t* packet)
     STM_EVAL_LEDToggle(LED7);
 }
 
+
+
 static uint8_t testBuf[64];
 
 packetResponse_t response[] = {
     {48,  testBuf, 48,  testBuf, toggleLED},
     {0,  NULL, 0,  NULL, toggleLED2},
-    {0,  NULL, 0,  NULL, NULL},
+    {1,  testBuf, 0,  NULL, PWM_Init},
     {0,  NULL, 0,  NULL, NULL},
     {0,  NULL, 0,  NULL, NULL},
     {0,  NULL, 0,  NULL, NULL},
@@ -116,7 +129,7 @@ static void sendResponse(Packet_t* packet)
 
 void runCommsFSM(char data)
 {
-    static CommsState_t state;
+    static CommsState_t state = WAITING_FOR_START_1;
     static uint8_t packetBuffer[MAX_PACKET_SIZE];
     static Packet_t* packet = (Packet_t*)packetBuffer;
     static uint32_t packetIdx; 
